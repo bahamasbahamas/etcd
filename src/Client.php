@@ -42,8 +42,6 @@ class Client implements ClientInterface
      */
     private $custom_ca_file;
 	
-	private $values = null;
-
     /**
      * @param string $server
      * @param string $api_version
