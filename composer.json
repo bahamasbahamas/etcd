@@ -1,5 +1,5 @@
 {
-  "name" : "citizenjessica/etcd",
+  "name" : "activecollab/etcd",
   "type": "library",
   "description": "etcd client with minimal dependencies",
   "license" : "MIT",
@@ -26,8 +26,8 @@
   "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
-      "CitizenJessica\\Etcd\\": "src",
-      "CitizenJessica\\Etcd\\Test\\": "test/src"
+      "ActiveCollab\\Etcd\\": "src",
+      "ActiveCollab\\Etcd\\Test\\": "test/src"
     }
   }
 }
