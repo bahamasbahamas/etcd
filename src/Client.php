@@ -41,6 +41,8 @@ class Client implements ClientInterface
      * @var string
      */
     private $custom_ca_file;
+	
+	private $values = null;
 
     /**
      * @param string $server
@@ -482,6 +484,8 @@ class Client implements ClientInterface
      */
     public function getKeyValueMap($root = '/', $recursive = true, $key = null)
     {
+		$this->values = null;
+		
         $this->listSubdirs($root, $recursive);
         if (isset($this->values[ $key ])) {
             return $this->values[ $key ];
