@@ -9,6 +9,7 @@ use RecursiveArrayIterator;
 
 /**
  * @package ActiveCollab\Etcd
+ * @version Jessica
  */
 class Client implements ClientInterface
 {
