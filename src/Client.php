@@ -432,6 +432,9 @@ class Client implements ClientInterface
         }
 
         $iterator = new RecursiveArrayIterator($data);
+	    
+	//reset iterator array
+        $this->dirs = [];
 
         return $this->traversalDir($iterator);
     }
