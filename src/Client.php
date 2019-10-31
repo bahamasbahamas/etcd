@@ -42,13 +42,15 @@ class Client implements ClientInterface
      * @var string
      */
     private $custom_ca_file;
-	
+
     /**
      * @param string $server
      * @param string $api_version
      */
-    public function __construct($server = 'http://127.0.0.1:4001', $api_version = 'v2')
-    {
+    public function __construct(
+        $server = 'http://127.0.0.1:4001',
+        $api_version = 'v2'
+    ) {
         $this->setServer($server);
         $this->setApiVersion($api_version);
     }
@@ -63,6 +65,7 @@ class Client implements ClientInterface
 
     /**
      * @param  string $server
+     *
      * @return $this
      */
     public function &setServer($server)
@@ -72,7 +75,8 @@ class Client implements ClientInterface
 
             if ($server) {
                 $this->server = $server;
-                $this->is_https = strtolower(parse_url($this->server)['scheme']) == 'https';
+                $this->is_https = strtolower(parse_url($this->server)['scheme'])
+                    == 'https';
             }
 
             return $this;
@@ -102,10 +106,13 @@ class Client implements ClientInterface
      *
      * @param  bool|true   $verify_ssl_peer
      * @param  string|null $custom_ca_file
+     *
      * @return $this
      */
-    public function &verifySslPeer($verify_ssl_peer = true, $custom_ca_file = null)
-    {
+    public function &verifySslPeer(
+        $verify_ssl_peer = true,
+        $custom_ca_file = null
+    ) {
         if ($custom_ca_file) {
             if (!is_file($custom_ca_file)) {
                 throw new \InvalidArgumentException('Custom CA file does not exist');
@@ -116,7 +123,7 @@ class Client implements ClientInterface
             }
         }
 
-        $this->verify_ssl_peer = (boolean) $verify_ssl_peer;
+        $this->verify_ssl_peer = (boolean)$verify_ssl_peer;
         $this->custom_ca_file = $custom_ca_file;
 
         return $this;
@@ -132,6 +139,7 @@ class Client implements ClientInterface
 
     /**
      * @param  string $version
+     *
      * @return $this
      */
     public function &setApiVersion($version)
@@ -161,6 +169,7 @@ class Client implements ClientInterface
      * </code>
      *
      * @param string $root
+     *
      * @return Client
      */
     public function &setSandboxPath($root)
@@ -178,6 +187,7 @@ class Client implements ClientInterface
      * Build key space operations
      *
      * @param  string $key
+     *
      * @return string
      */
     public function getKeyPath($key)
@@ -186,13 +196,15 @@ class Client implements ClientInterface
             $key = '/' . $key;
         }
 
-        return rtrim('/' . $this->api_version . '/keys' . $this->root, '/') . $key;
+        return rtrim('/' . $this->api_version . '/keys' . $this->root, '/')
+            . $key;
     }
 
     /**
      * Return full key URI
      *
      * @param  string $key
+     *
      * @return string
      */
     public function getKeyUrl($key)
@@ -216,7 +228,8 @@ class Client implements ClientInterface
         try {
             $response = $this->httpGet($this->getKeyUrl($key));
 
-            return !empty($response['node']) && array_key_exists('value', $response['node']);
+            return !empty($response['node'])
+                && array_key_exists('value', $response['node']);
         } catch (KeyNotFoundException $e) {
             return false;
         }
@@ -253,6 +266,7 @@ class Client implements ClientInterface
      *
      * @param string $key
      * @param array  $flags the extra query params
+     *
      * @return array
      * @throws KeyNotFoundException
      * @throws EtcdException
@@ -278,6 +292,7 @@ class Client implements ClientInterface
      *
      * @param string $key
      * @param array  $flags the extra query params
+     *
      * @return string the value of the key.
      * @throws KeyNotFoundException
      */
@@ -298,12 +313,14 @@ class Client implements ClientInterface
      * @param string $key
      * @param string $value
      * @param int    $ttl
+     *
      * @return array $body
      * @throws KeyExistsException
      */
     public function create($key, $value, $ttl = 0)
     {
-        return $request = $this->set($key, $value, $ttl, ['prevExist' => 'false']);
+        return $request = $this->set($key, $value, $ttl,
+            ['prevExist' => 'false']);
     }
 
     /**
@@ -311,6 +328,7 @@ class Client implements ClientInterface
      *
      * @param string $key
      * @param int    $ttl
+     *
      * @return array $body
      * @throws KeyExistsException
      */
@@ -322,7 +340,8 @@ class Client implements ClientInterface
             $data['ttl'] = $ttl;
         }
 
-        return $this->httpPut($this->getKeyUrl($key), $data, ['prevExist' => 'false']);
+        return $this->httpPut($this->getKeyUrl($key), $data,
+            ['prevExist' => 'false']);
     }
 
     /**
@@ -332,6 +351,7 @@ class Client implements ClientInterface
      * @param string $value
      * @param int    $ttl
      * @param array  $condition The extra condition for updating
+     *
      * @return array $body
      * @throws KeyNotFoundException
      */
@@ -349,8 +369,9 @@ class Client implements ClientInterface
     /**
      * Update directory
      *
-     * @param  string        $key
-     * @param  int           $ttl
+     * @param  string $key
+     * @param  int    $ttl
+     *
      * @return array
      * @throws EtcdException
      */
@@ -360,8 +381,8 @@ class Client implements ClientInterface
             throw new EtcdException('TTL is required', 204);
         }
 
-        return $this->httpPut($this->getKeyUrl($key), ['ttl' => (int) $ttl], [
-            'dir' => 'true',
+        return $this->httpPut($this->getKeyUrl($key), ['ttl' => (int)$ttl], [
+            'dir'       => 'true',
             'prevExist' => 'true',
         ]);
     }
@@ -370,6 +391,7 @@ class Client implements ClientInterface
      * remove a key
      *
      * @param string $key
+     *
      * @return array
      * @throws EtcdException
      */
@@ -383,6 +405,7 @@ class Client implements ClientInterface
      *
      * @param string  $key
      * @param boolean $recursive
+     *
      * @return mixed
      * @throws EtcdException
      */
@@ -394,7 +417,8 @@ class Client implements ClientInterface
             $query['recursive'] = 'true';
         }
 
-        return $this->httpDelete($this->server . $this->getKeyPath($key), $query);
+        return $this->httpDelete($this->server . $this->getKeyPath($key),
+            $query);
     }
 
     /**
@@ -402,6 +426,7 @@ class Client implements ClientInterface
      *
      * @param string  $key
      * @param boolean $recursive
+     *
      * @return mixed
      * @throws KeyNotFoundException
      */
@@ -420,6 +445,7 @@ class Client implements ClientInterface
      *
      * @param string  $key
      * @param boolean $recursive
+     *
      * @return array
      * @throws EtcdException
      */
@@ -432,8 +458,8 @@ class Client implements ClientInterface
         }
 
         $iterator = new RecursiveArrayIterator($data);
-	    
-	    //reset iterator array
+
+        //reset iterator array
         $this->dirs = [];
 
         return $this->traversalDir($iterator);
@@ -453,6 +479,7 @@ class Client implements ClientInterface
      * Traversal the directory to get the keys.
      *
      * @param RecursiveArrayIterator $iterator
+     *
      * @return array
      */
     private function traversalDir(RecursiveArrayIterator $iterator)
@@ -462,12 +489,14 @@ class Client implements ClientInterface
             if ($iterator->hasChildren()) {
                 $this->traversalDir($iterator->getChildren());
             } else {
-                if ($iterator->key() == 'key' && ($iterator->current() != '/')) {
+                if ($iterator->key() == 'key'
+                    && ($iterator->current() != '/')
+                ) {
                     $this->dirs[] = $key = $iterator->current();
                 }
 
                 if ($iterator->key() == 'value') {
-                    $this->values[ $key ] = $iterator->current();
+                    $this->values[$key] = $iterator->current();
                 }
             }
             $iterator->next();
@@ -482,15 +511,16 @@ class Client implements ClientInterface
      * @param string  $root
      * @param boolean $recursive
      * @param string  $key
+     *
      * @return array
      */
     public function getKeyValueMap($root = '/', $recursive = true, $key = null)
     {
-		$this->values = null;
-		
+        $this->values = null;
+
         $this->listSubdirs($root, $recursive);
-        if (isset($this->values[ $key ])) {
-            return $this->values[ $key ];
+        if (isset($this->values[$key])) {
+            return $this->values[$key];
         }
 
         return $this->values;
@@ -505,7 +535,8 @@ class Client implements ClientInterface
 
         if ($sandbox_path != $current_sandbox_path) {
             if (mb_substr($sandbox_path, 0, 2) == './') {
-                $this->setSandboxPath($current_sandbox_path . mb_substr($sandbox_path, 1));
+                $this->setSandboxPath($current_sandbox_path
+                    . mb_substr($sandbox_path, 1));
             } else {
                 $this->setSandboxPath($sandbox_path);
             }
@@ -527,6 +558,7 @@ class Client implements ClientInterface
      *
      * @param  string $url
      * @param  array  $query_arguments
+     *
      * @return array
      */
     private function httpGet($url, $query_arguments = [])
@@ -541,9 +573,10 @@ class Client implements ClientInterface
     /**
      * Make a POST request
      *
-     * @param  string        $url
-     * @param  array         $payload
-     * @param  array         $query_arguments
+     * @param  string $url
+     * @param  array  $payload
+     * @param  array  $query_arguments
+     *
      * @return array|mixed
      * @throws EtcdException
      */
@@ -556,7 +589,8 @@ class Client implements ClientInterface
         $curl = $this->getCurlHandle($url);
 
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER,
+            ['Content-Type: application/x-www-form-urlencoded']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($payload));
 
         return $this->executeCurlRequest($curl, $url);
@@ -565,9 +599,10 @@ class Client implements ClientInterface
     /**
      * Make a PUT request
      *
-     * @param  string        $url
-     * @param  array         $payload
-     * @param  array         $query_arguments
+     * @param  string $url
+     * @param  array  $payload
+     * @param  array  $query_arguments
+     *
      * @return array|mixed
      * @throws EtcdException
      */
@@ -580,7 +615,8 @@ class Client implements ClientInterface
         $curl = $this->getCurlHandle($url);
 
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER,
+            ['Content-Type: application/x-www-form-urlencoded']);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($payload));
 
         return $this->executeCurlRequest($curl, $url);
@@ -589,8 +625,9 @@ class Client implements ClientInterface
     /**
      * Make a DELETE request
      *
-     * @param  string        $url
-     * @param  array         $query_arguments
+     * @param  string $url
+     * @param  array  $query_arguments
+     *
      * @return array|mixed
      * @throws EtcdException
      */
@@ -610,7 +647,8 @@ class Client implements ClientInterface
     /**
      * Initialize curl handle
      *
-     * @param  string   $url
+     * @param  string $url
+     *
      * @return resource
      */
     private function getCurlHandle($url)
@@ -639,9 +677,10 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param  resource      $curl
-     * @param  string        $url
-     * @param  bool|true     $decode_etcd_json
+     * @param  resource  $curl
+     * @param  string    $url
+     * @param  bool|true $decode_etcd_json
+     *
      * @return array|mixed
      * @throws EtcdException
      */
@@ -653,7 +692,8 @@ class Client implements ClientInterface
             $error = curl_error($curl);
 
             curl_close($curl);
-            throw new \RuntimeException("$url request failed. Reason: $error", $error_code);
+            throw new \RuntimeException("$url request failed. Reason: $error",
+                $error_code);
         } else {
             curl_close($curl);
 
